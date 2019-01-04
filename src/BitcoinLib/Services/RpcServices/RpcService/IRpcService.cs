@@ -2,6 +2,8 @@
 // See the accompanying file LICENSE for the Software License Aggrement
 
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using BitcoinLib.Requests.AddNode;
 using BitcoinLib.Requests.CreateRawTransaction;
 using BitcoinLib.Requests.SignRawTransaction;
@@ -13,143 +15,143 @@ namespace BitcoinLib.Services.RpcServices.RpcService
     {
         #region Blockchain
 
-        string GetBestBlockHash();
-        GetBlockResponse GetBlock(string hash, bool verbose = true);
-        GetBlockchainInfoResponse GetBlockchainInfo();
-        uint GetBlockCount();
-        string GetBlockHash(long index);
+        Task<string> GetBestBlockHashAsync(CancellationToken cancellationToken);
+        Task<GetBlockResponse> GetBlockAsync(string hash, bool verbose, CancellationToken cancellationToken);
+        Task<GetBlockchainInfoResponse> GetBlockchainInfoAsync(CancellationToken cancellationToken);
+        Task<uint> GetBlockCountAsync(CancellationToken cancellationToken);
+        Task<string> GetBlockHashAsync(long index, CancellationToken cancellationToken);
         //  getblockheader
         //  getchaintips
-        double GetDifficulty();
-        List<GetChainTipsResponse> GetChainTips();
-        GetMemPoolInfoResponse GetMemPoolInfo();
-        GetRawMemPoolResponse GetRawMemPool(bool verbose = false);
-        GetTransactionResponse GetTxOut(string txId, int n, bool includeMemPool = true);
+        Task<double> GetDifficultyAsync(CancellationToken cancellationToken);
+        Task<List<GetChainTipsResponse>> GetChainTipsAsync(CancellationToken cancellationToken);
+        Task<GetMemPoolInfoResponse> GetMemPoolInfoAsync(CancellationToken cancellationToken);
+        Task<GetRawMemPoolResponse> GetRawMemPoolAsync(bool verbose, CancellationToken cancellationToken);
+        Task<GetTransactionResponse> GetTxOutAsync(string txId, int n, bool includeMemPool, CancellationToken cancellationToken);
         //  gettxoutproof["txid",...] ( blockhash )
-        GetTxOutSetInfoResponse GetTxOutSetInfo();
-        bool VerifyChain(ushort checkLevel = 3, uint numBlocks = 288); //  Note: numBlocks: 0 => ALL
+        Task<GetTxOutSetInfoResponse> GetTxOutSetInfoAsync(CancellationToken cancellationToken);
+        Task<bool> VerifyChainAsync(ushort checkLevel, uint numBlocks, CancellationToken cancellationToken); //  Note: numBlocks: 0 => ALL
 
         #endregion
 
         #region Control
 
-        GetInfoResponse GetInfo();
-        string Help(string command = null);
-        string Stop();
+        Task<GetInfoResponse> GetInfoAsync(CancellationToken cancellationToken);
+        Task<string> HelpAsync(string command, CancellationToken cancellationToken);
+        Task<string> StopAsync(CancellationToken cancellationToken);
 
         #endregion
 
         #region Generating
 
         //  generate numblocks
-        bool GetGenerate();
-        string SetGenerate(bool generate, short generatingProcessorsLimit);
+        Task<bool> GetGenerateAsync(CancellationToken cancellationToken);
+        Task<string> SetGenerateAsync(bool generate, short generatingProcessorsLimit, CancellationToken cancellationToken);
 
         #endregion
 
         #region Mining
 
-        GetBlockTemplateResponse GetBlockTemplate(params object[] parameters);
-        GetMiningInfoResponse GetMiningInfo();
-        ulong GetNetworkHashPs(uint blocks = 120, long height = -1);
-        bool PrioritiseTransaction(string txId, decimal priorityDelta, decimal feeDelta);
-        string SubmitBlock(string hexData, params object[] parameters);
+        Task<GetBlockTemplateResponse> GetBlockTemplateAsync(CancellationToken cancellationToken, params object[] parameters);
+        Task<GetMiningInfoResponse> GetMiningInfoAsync(CancellationToken cancellationToken);
+        Task<ulong> GetNetworkHashPsAsync(uint blocks, long height, CancellationToken cancellationToken);
+        Task<bool> PrioritiseTransactionAsync(string txId, decimal priorityDelta, decimal feeDelta, CancellationToken cancellationToken);
+        Task<string> SubmitBlockAsync(string hexData, CancellationToken cancellationToken, params object[] parameters);
 
         #endregion
 
         #region Network
 
-        void AddNode(string node, NodeAction action);
+        Task AddNodeAsync(string node, NodeAction action, CancellationToken cancellationToken);
         //  clearbanned
         //  disconnectnode
-        GetAddedNodeInfoResponse GetAddedNodeInfo(string dns, string node = null);
-        int GetConnectionCount();
-        GetNetTotalsResponse GetNetTotals();
-        GetNetworkInfoResponse GetNetworkInfo();
-        List<GetPeerInfoResponse> GetPeerInfo();
+        Task<GetAddedNodeInfoResponse> GetAddedNodeInfoAsync(string dns, string node, CancellationToken cancellationToken);
+        Task<int> GetConnectionCountAsync(CancellationToken cancellationToken);
+        Task<GetNetTotalsResponse> GetNetTotalsAsync(CancellationToken cancellationToken);
+        Task<GetNetworkInfoResponse> GetNetworkInfoAsync(CancellationToken cancellationToken);
+        Task<List<GetPeerInfoResponse>> GetPeerInfoAsync(CancellationToken cancellationToken);
         //  listbanned
-        void Ping();
+        Task PingAsync(CancellationToken cancellationToken);
         //  setban
 
         #endregion
 
         #region Rawtransactions
 
-        string CreateRawTransaction(CreateRawTransactionRequest rawTransaction);
-        DecodeRawTransactionResponse DecodeRawTransaction(string rawTransactionHexString);
-        DecodeScriptResponse DecodeScript(string hexString);
+        Task<string> CreateRawTransactionAsync(CreateRawTransactionRequest rawTransaction, CancellationToken cancellationToken);
+        Task<DecodeRawTransactionResponse> DecodeRawTransactionAsync(string rawTransactionHexString, CancellationToken cancellationToken);
+        Task<DecodeScriptResponse> DecodeScriptAsync(string hexString, CancellationToken cancellationToken);
         //  fundrawtransaction
-        GetRawTransactionResponse GetRawTransaction(string txId, int verbose = 0);
-        string SendRawTransaction(string rawTransactionHexString, bool? allowHighFees = false);
-        SignRawTransactionResponse SignRawTransaction(SignRawTransactionRequest signRawTransactionRequest);
-        SignRawTransactionWithKeyResponse SignRawTransactionWithKey(SignRawTransactionWithKeyRequest signRawTransactionWithKeyRequest);
-        SignRawTransactionWithWalletResponse SignRawTransactionWithWallet(SignRawTransactionWithWalletRequest signRawTransactionWithWalletRequest);
-        GetFundRawTransactionResponse GetFundRawTransaction(string rawTransactionHex);
+        Task<GetRawTransactionResponse> GetRawTransactionAsync(string txId, int verbose, CancellationToken cancellationToken);
+        Task<string> SendRawTransactionAsync(string rawTransactionHexString, bool? allowHighFees, CancellationToken cancellationToken);
+        Task<SignRawTransactionResponse> SignRawTransactionAsync(SignRawTransactionRequest signRawTransactionRequest, CancellationToken cancellationToken);
+        Task<SignRawTransactionWithKeyResponse> SignRawTransactionWithKeyAsync(SignRawTransactionWithKeyRequest signRawTransactionWithKeyRequest, CancellationToken cancellationToken);
+        Task<SignRawTransactionWithWalletResponse> SignRawTransactionWithWalletAsync(SignRawTransactionWithWalletRequest signRawTransactionWithWalletRequest, CancellationToken cancellationToken);
+        Task<GetFundRawTransactionResponse> GetFundRawTransactionAsync(string rawTransactionHex, CancellationToken cancellationToken);
 
         #endregion
 
         #region Util
 
-        CreateMultiSigResponse CreateMultiSig(int nRquired, List<string> publicKeys);
-        decimal EstimateFee(ushort nBlocks);
-        EstimateSmartFeeResponse EstimateSmartFee(ushort nBlocks);
-        decimal EstimatePriority(ushort nBlocks);
+        Task<CreateMultiSigResponse> CreateMultiSigAsync(int nRquired, List<string> publicKeys, CancellationToken cancellationToken);
+        Task<decimal> EstimateFeeAsync(ushort nBlocks, CancellationToken cancellationToken);
+        Task<EstimateSmartFeeResponse> EstimateSmartFeeAsync(ushort nBlocks, CancellationToken cancellationToken);
+        Task<decimal> EstimatePriorityAsync(ushort nBlocks, CancellationToken cancellationToken);
         //  estimatesmartfee
         //  estimatesmartpriority
-        ValidateAddressResponse ValidateAddress(string bitcoinAddress);
-        bool VerifyMessage(string bitcoinAddress, string signature, string message);
+        Task<ValidateAddressResponse> ValidateAddressAsync(string bitcoinAddress, CancellationToken cancellationToken);
+        Task<bool> VerifyMessageAsync(string bitcoinAddress, string signature, string message, CancellationToken cancellationToken);
 
         #endregion
 
         #region Wallet
 
         //  abandontransaction
-        string AddMultiSigAddress(int nRquired, List<string> publicKeys, string account = null);
-        string AddWitnessAddress(string address);
-        void BackupWallet(string destination);
-        string DumpPrivKey(string bitcoinAddress);
-        void DumpWallet(string filename);
-        string GetAccount(string bitcoinAddress);
-        string GetAccountAddress(string account);
-        List<string> GetAddressesByAccount(string account);
-        Dictionary<string, GetAddressesByLabelResponse> GetAddressesByLabel(string label);
-        GetAddressInfoResponse GetAddressInfo(string bitcoinAddress);
-        decimal GetBalance(string account = null, int minConf = 1, bool? includeWatchonly = null);
-        string GetNewAddress(string account = "");
-        string GetRawChangeAddress();
-        decimal GetReceivedByAccount(string account, int minConf = 1);
-        decimal GetReceivedByAddress(string bitcoinAddress, int minConf = 1);
-        decimal GetReceivedByLabel(string account, int minConf = 1);
-        GetTransactionResponse GetTransaction(string txId, bool? includeWatchonly = null);
-        decimal GetUnconfirmedBalance();
-        GetWalletInfoResponse GetWalletInfo();
-        void ImportAddress(string address, string label = null, bool rescan = true);
-        string ImportPrivKey(string privateKey, string label = null, bool rescan = true);
+        Task<string> AddMultiSigAddressAsync(int nRquired, List<string> publicKeys, string account, CancellationToken cancellationToken);
+        Task<string> AddWitnessAddressAsync(string address, CancellationToken cancellationToken);
+        Task BackupWalletAsync(string destination, CancellationToken cancellationToken);
+        Task<string> DumpPrivKeyAsync(string bitcoinAddress, CancellationToken cancellationToken);
+        Task DumpWalletAsync(string filename, CancellationToken cancellationToken);
+        Task<string> GetAccountAsync(string bitcoinAddress, CancellationToken cancellationToken);
+        Task<string> GetAccountAddressAsync(string account, CancellationToken cancellationToken);
+        Task<List<string>> GetAddressesByAccountAsync(string account, CancellationToken cancellationToken);
+        Task<Dictionary<string, GetAddressesByLabelResponse>> GetAddressesByLabelAsync(string label, CancellationToken cancellationToken);
+        Task<GetAddressInfoResponse> GetAddressInfoAsync(string bitcoinAddress, CancellationToken cancellationToken);
+        Task<decimal> GetBalanceAsync(string account, int minConf, bool? includeWatchonly, CancellationToken cancellationToken);
+        Task<string> GetNewAddressAsync(string account, CancellationToken cancellationToken);
+        Task<string> GetRawChangeAddressAsync(CancellationToken cancellationToken);
+        Task<decimal> GetReceivedByAccountAsync(string account, int minConf, CancellationToken cancellationToken);
+        Task<decimal> GetReceivedByAddressAsync(string bitcoinAddress, int minConf, CancellationToken cancellationToken);
+        Task<decimal> GetReceivedByLabelAsync(string account, int minConf, CancellationToken cancellationToken);
+        Task<GetTransactionResponse> GetTransactionAsync(string txId, bool? includeWatchonly, CancellationToken cancellationToken);
+        Task<decimal> GetUnconfirmedBalanceAsync(CancellationToken cancellationToken);
+        Task<GetWalletInfoResponse> GetWalletInfoAsync(CancellationToken cancellationToken);
+        Task ImportAddressAsync(string address, string label, bool rescan, CancellationToken cancellationToken);
+        Task<string> ImportPrivKeyAsync(string privateKey, string label, bool rescan, CancellationToken cancellationToken);
         //  importpubkey
-        void ImportWallet(string filename);
-        string KeyPoolRefill(uint newSize = 100);
-        Dictionary<string, decimal> ListAccounts(int minConf = 1, bool? includeWatchonly = null);
-        List<List<ListAddressGroupingsResponse>> ListAddressGroupings();
-        List<string> ListLabels();
-        string ListLockUnspent();
-        List<ListReceivedByAccountResponse> ListReceivedByAccount(int minConf = 1, bool includeEmpty = false, bool? includeWatchonly = null);
-        List<ListReceivedByAddressResponse> ListReceivedByAddress(int minConf = 1, bool includeEmpty = false, bool? includeWatchonly = null);
-        List<ListReceivedByLabelResponse> ListReceivedByLabel(int minConf = 1, bool includeEmpty = false, bool? includeWatchonly = null);
-        ListSinceBlockResponse ListSinceBlock(string blockHash = null, int targetConfirmations = 1, bool? includeWatchonly = null);
-        List<ListTransactionsResponse> ListTransactions(string account = null, int count = 10, int from = 0, bool? includeWatchonly = null);
-        List<ListUnspentResponse> ListUnspent(int minConf = 1, int maxConf = 9999999, List<string> addresses = null);
-        bool LockUnspent(bool unlock, IList<ListUnspentResponse> listUnspentResponses);
-        bool Move(string fromAccount, string toAccount, decimal amount, int minConf = 1, string comment = "");
-        string SendFrom(string fromAccount, string toBitcoinAddress, decimal amount, int minConf = 1, string comment = null, string commentTo = null);
-        string SendMany(string fromAccount, Dictionary<string, decimal> toBitcoinAddress, int minConf = 1, string comment = null);
-        string SendToAddress(string bitcoinAddress, decimal amount, string comment = null, string commentTo = null, bool subtractFeeFromAmount = false);
-        string SetAccount(string bitcoinAddress, string account);
-        string SetLabel(string bitcoinAddress, string label);
-        string SetTxFee(decimal amount);
-        string SignMessage(string bitcoinAddress, string message);
-        string WalletLock();
-        string WalletPassphrase(string passphrase, int timeoutInSeconds);
-        string WalletPassphraseChange(string oldPassphrase, string newPassphrase);
+        Task ImportWalletAsync(string filename, CancellationToken cancellationToken);
+        Task<string> KeyPoolRefillAsync(uint newSize, CancellationToken cancellationToken);
+        Task<Dictionary<string, decimal>> ListAccountsAsync(int minConf, bool? includeWatchonly, CancellationToken cancellationToken);
+        Task<List<List<ListAddressGroupingsResponse>>> ListAddressGroupingsAsync(CancellationToken cancellationToken);
+        Task<List<string>> ListLabelsAsync(CancellationToken cancellationToken);
+        Task<string> ListLockUnspentAsync(CancellationToken cancellationToken);
+        Task<List<ListReceivedByAccountResponse>> ListReceivedByAccountAsync(int minConf, bool includeEmpty, bool? includeWatchonly, CancellationToken cancellationToken);
+        Task<List<ListReceivedByAddressResponse>> ListReceivedByAddressAsync(int minConf, bool includeEmpty, bool? includeWatchonly, CancellationToken cancellationToken);
+        Task<List<ListReceivedByLabelResponse>> ListReceivedByLabelAsync(int minConf, bool includeEmpty, bool? includeWatchonly, CancellationToken cancellationToken);
+        Task<ListSinceBlockResponse> ListSinceBlockAsync(string blockHash, int targetConfirmations, bool? includeWatchonly, CancellationToken cancellationToken);
+        Task<List<ListTransactionsResponse>> ListTransactionsAsync(string account, int count, int from, bool? includeWatchonly, CancellationToken cancellationToken);
+        Task<List<ListUnspentResponse>> ListUnspentAsync(int minConf, int maxConf, List<string> addresses, CancellationToken cancellationToken);
+        Task<bool> LockUnspentAsync(bool unlock, IList<ListUnspentResponse> listUnspentResponses, CancellationToken cancellationToken);
+        Task<bool> MoveAsync(string fromAccount, string toAccount, decimal amount, int minConf, string comment, CancellationToken cancellationToken);
+        Task<string> SendFromAsync(string fromAccount, string toBitcoinAddress, decimal amount, int minConf, string comment, string commentTo, CancellationToken cancellationToken);
+        Task<string> SendManyAsync(string fromAccount, Dictionary<string, decimal> toBitcoinAddress, int minConf, string comment, CancellationToken cancellationToken);
+        Task<string> SendToAddressAsync(string bitcoinAddress, decimal amount, string comment, string commentTo, bool subtractFeeFromAmount, CancellationToken cancellationToken);
+        Task<string> SetAccountAsync(string bitcoinAddress, string account, CancellationToken cancellationToken);
+        Task<string> SetLabelAsync(string bitcoinAddress, string label, CancellationToken cancellationToken);
+        Task<string> SetTxFeeAsync(decimal amount, CancellationToken cancellationToken);
+        Task<string> SignMessageAsync(string bitcoinAddress, string message, CancellationToken cancellationToken);
+        Task<string> WalletLockAsync(CancellationToken cancellationToken);
+        Task<string> WalletPassphraseAsync(string passphrase, int timeoutInSeconds, CancellationToken cancellationToken);
+        Task<string> WalletPassphraseChangeAsync(string oldPassphrase, string newPassphrase, CancellationToken cancellationToken);
 
         #endregion
     }

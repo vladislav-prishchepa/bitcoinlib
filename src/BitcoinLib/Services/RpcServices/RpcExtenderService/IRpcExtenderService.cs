@@ -2,6 +2,8 @@
 // See the accompanying file LICENSE for the Software License Aggrement
 
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using BitcoinLib.Requests.CreateRawTransaction;
 using BitcoinLib.Responses;
 
@@ -9,21 +11,21 @@ namespace BitcoinLib.Services.RpcServices.RpcExtenderService
 {
     public interface IRpcExtenderService
     {
-        decimal GetAddressBalance(string inWalletAddress, int minConf = 0, bool validateAddressBeforeProcessing = true);
-        decimal GetMinimumNonZeroTransactionFeeEstimate(short numberOfInputs = 1, short numberOfOutputs = 1);
-        Dictionary<string, string> GetMyPublicAndPrivateKeyPairs();
-        DecodeRawTransactionResponse GetPublicTransaction(string txId);
-        decimal GetTransactionFee(CreateRawTransactionRequest createRawTransactionRequest, bool checkIfTransactionQualifiesForFreeRelay = true, bool enforceMinimumTransactionFeePolicy = true);
-        decimal GetTransactionPriority(CreateRawTransactionRequest createRawTransactionRequest);
+        Task<decimal> GetAddressBalanceAsync(string inWalletAddress, int minConf, bool validateAddressBeforeProcessing, CancellationToken cancellationToken);
+        Task<decimal> GetMinimumNonZeroTransactionFeeEstimateAsync(short numberOfInputs, short numberOfOutputs, CancellationToken cancellationToken);
+        Task<Dictionary<string, string>> GetMyPublicAndPrivateKeyPairsAsync(CancellationToken cancellationToken);
+        Task<DecodeRawTransactionResponse> GetPublicTransactionAsync(string txId, CancellationToken cancellationToken);
+        Task<decimal> GetTransactionFeeAsync(CreateRawTransactionRequest createRawTransactionRequest, bool checkIfTransactionQualifiesForFreeRelay, bool enforceMinimumTransactionFeePolicy, CancellationToken cancellationToken);
+        Task<decimal> GetTransactionPriorityAsync(CreateRawTransactionRequest transaction, CancellationToken cancellationToken);
         decimal GetTransactionPriority(IList<ListUnspentResponse> transactionInputs, int numberOfOutputs);
-        string GetTransactionSenderAddress(string txId);
+        Task<string> GetTransactionSenderAddressAsync(string txId, CancellationToken cancellationToken);
         int GetTransactionSizeInBytes(CreateRawTransactionRequest createRawTransactionRequest);
         int GetTransactionSizeInBytes(int numberOfInputs, int numberOfOutputs);
-        GetRawTransactionResponse GetRawTxFromImmutableTxId(string rigidTxId, int listTransactionsCount = int.MaxValue, int listTransactionsFrom = 0, bool getRawTransactionVersbose = true, bool rigidTxIdIsSha256 = false);
-        string GetImmutableTxId(string txId, bool getSha256Hash = false);
-        bool IsInWalletTransaction(string txId);
-        bool IsTransactionFree(CreateRawTransactionRequest createRawTransactionRequest);
+        Task<GetRawTransactionResponse> GetRawTxFromImmutableTxIdAsync(string rigidTxId, int listTransactionsCount, int listTransactionsFrom, bool getRawTransactionVersbose, bool rigidTxIdIsSha256, CancellationToken cancellationToken);
+        Task<string> GetImmutableTxIdAsync(string txId, bool getSha256Hash, CancellationToken cancellationToken);
+        Task<bool> IsInWalletTransactionAsync(string txId, CancellationToken cancellationToken);
+        Task<bool> IsTransactionFreeAsync(CreateRawTransactionRequest createRawTransactionRequest, CancellationToken cancellationToken);
         bool IsTransactionFree(IList<ListUnspentResponse> transactionInputs, int numberOfOutputs, decimal minimumAmountAmongOutputs);
-        bool IsWalletEncrypted();
+        Task<bool> IsWalletEncryptedAsync(CancellationToken cancellationToken);
     }
 }

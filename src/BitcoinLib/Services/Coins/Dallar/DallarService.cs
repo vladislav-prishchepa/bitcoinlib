@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2014 - 2016 George Kimionis
 // See the accompanying file LICENSE for the Software License Aggrement
 
+using System.Threading;
+using System.Threading.Tasks;
 using BitcoinLib.CoinParameters.Dallar;
 using BitcoinLib.Requests.CreateRawTransaction;
 using BitcoinLib.Responses;
@@ -26,11 +28,13 @@ namespace BitcoinLib.Services.Coins.Dallar
 
         public DallarConstants.Constants Constants => DallarConstants.Constants.Instance;
 
-        public decimal GetEstimateFeeForSendToAddress(string Address, decimal Amount)
+        public async Task<decimal> GetEstimateFeeForSendToAddressAsync(string Address, decimal Amount, CancellationToken cancellationToken)
         {
             var txRequest = new CreateRawTransactionRequest();
             txRequest.AddOutput(Address, Amount);
-            return GetFundRawTransaction(CreateRawTransaction(txRequest)).Fee;
+            var rawTransaction = await CreateRawTransactionAsync(txRequest, cancellationToken);
+            var fundTransaction = await GetFundRawTransactionAsync(rawTransaction, cancellationToken);
+            return fundTransaction.Fee;
         }
     }
 }

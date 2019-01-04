@@ -1,4 +1,6 @@
-﻿using BitcoinLib.CoinParameters.Dash;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using BitcoinLib.CoinParameters.Dash;
 using BitcoinLib.RPC.Specifications;
 
 namespace BitcoinLib.Services.Coins.Dash
@@ -21,10 +23,10 @@ namespace BitcoinLib.Services.Coins.Dash
         }
 
         /// <inheritdoc />
-        public string SendToAddress(string dashAddress, decimal amount, string comment = null, string commentTo = null,
-            bool subtractFeeFromAmount = false, bool useInstantSend = false, bool usePrivateSend = false)
+        public Task<string> SendToAddressAsync(string dashAddress, decimal amount, string comment = null, string commentTo = null,
+            bool subtractFeeFromAmount = false, bool useInstantSend = false, bool usePrivateSend = false, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _rpcConnector.MakeRequest<string>(RpcMethods.sendtoaddress, dashAddress, amount, comment, commentTo,
+            return _rpcConnector.MakeRequestAsync<string>(RpcMethods.sendtoaddress, cancellationToken, dashAddress, amount, comment, commentTo,
                 subtractFeeFromAmount, useInstantSend, usePrivateSend);
         }
 

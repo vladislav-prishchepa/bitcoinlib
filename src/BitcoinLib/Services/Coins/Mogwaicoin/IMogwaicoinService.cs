@@ -1,6 +1,8 @@
 ﻿using BitcoinLib.CoinParameters.Mogwaicoin;
 using BitcoinLib.Services.Coins.Base;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BitcoinLib.Services.Coins.Mogwaicoin
 {
@@ -26,22 +28,22 @@ namespace BitcoinLib.Services.Coins.Mogwaicoin
         /// <param name="useInstantSend">Send this transaction as InstantSend.</param>
         /// <param name="usePrivateSend">Use anonymized funds only.</param>
         /// <returns>The transaction id.</returns>
-        string SendToAddress(string dashAddress, decimal amount, string comment = null,
+        Task<string> SendToAddressAsync(string dashAddress, decimal amount, string comment = null,
             string commentTo = null, bool subtractFeeFromAmount = false, bool useInstantSend = false,
-            bool usePrivateSend = false);
+            bool usePrivateSend = false, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         ///     Get MirrorAddress
         /// </summary>
         /// <param name="mogwaiAddress">The mogwai address to send to.</param>
         /// <returns></returns>
-        MirrorAddressResponse MirrorAddress(string mogwaiAddress);
+        Task<MirrorAddressResponse> MirrorAddressAsync(string mogwaiAddress, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Get transactions sent to MirrorAddress 
         /// </summary>
         /// <param name="mogwaiAddress">The mogwai address to send to.</param>
         /// <returns></returns>
-        List<ListMirrorTransactionsResponse> ListMirrorTransactions(string mogwaiAddress);
+        Task<List<ListMirrorTransactionsResponse>> ListMirrorTransactionsAsync(string mogwaiAddress, CancellationToken cancellationToken);
     }
 }
