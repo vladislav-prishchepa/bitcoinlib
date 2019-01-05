@@ -11,21 +11,21 @@ namespace BitcoinLib.Services.RpcServices.RpcExtenderService
 {
     public interface IRpcExtenderService
     {
-        Task<decimal> GetAddressBalanceAsync(string inWalletAddress, int minConf, bool validateAddressBeforeProcessing, CancellationToken cancellationToken);
-        Task<decimal> GetMinimumNonZeroTransactionFeeEstimateAsync(short numberOfInputs, short numberOfOutputs, CancellationToken cancellationToken);
-        Task<Dictionary<string, string>> GetMyPublicAndPrivateKeyPairsAsync(CancellationToken cancellationToken);
-        Task<DecodeRawTransactionResponse> GetPublicTransactionAsync(string txId, CancellationToken cancellationToken);
-        Task<decimal> GetTransactionFeeAsync(CreateRawTransactionRequest createRawTransactionRequest, bool checkIfTransactionQualifiesForFreeRelay, bool enforceMinimumTransactionFeePolicy, CancellationToken cancellationToken);
-        Task<decimal> GetTransactionPriorityAsync(CreateRawTransactionRequest transaction, CancellationToken cancellationToken);
+        Task<decimal> GetAddressBalanceAsync(string inWalletAddress, int minConf = 0, bool validateAddressBeforeProcessing = true, CancellationToken cancellationToken = default);
+        Task<decimal> GetMinimumNonZeroTransactionFeeEstimateAsync(short numberOfInputs = 1, short numberOfOutputs = 1, CancellationToken cancellationToken = default);
+        Task<Dictionary<string, string>> GetMyPublicAndPrivateKeyPairsAsync(CancellationToken cancellationToken = default);
+        Task<DecodeRawTransactionResponse> GetPublicTransactionAsync(string txId, CancellationToken cancellationToken = default);
+        Task<decimal> GetTransactionFeeAsync(CreateRawTransactionRequest createRawTransactionRequest, bool checkIfTransactionQualifiesForFreeRelay = true, bool enforceMinimumTransactionFeePolicy = true, CancellationToken cancellationToken = default);
+        Task<decimal> GetTransactionPriorityAsync(CreateRawTransactionRequest transaction, CancellationToken cancellationToken = default);
         decimal GetTransactionPriority(IList<ListUnspentResponse> transactionInputs, int numberOfOutputs);
-        Task<string> GetTransactionSenderAddressAsync(string txId, CancellationToken cancellationToken);
+        Task<string> GetTransactionSenderAddressAsync(string txId, CancellationToken cancellationToken = default);
         int GetTransactionSizeInBytes(CreateRawTransactionRequest createRawTransactionRequest);
         int GetTransactionSizeInBytes(int numberOfInputs, int numberOfOutputs);
-        Task<GetRawTransactionResponse> GetRawTxFromImmutableTxIdAsync(string rigidTxId, int listTransactionsCount, int listTransactionsFrom, bool getRawTransactionVersbose, bool rigidTxIdIsSha256, CancellationToken cancellationToken);
-        Task<string> GetImmutableTxIdAsync(string txId, bool getSha256Hash, CancellationToken cancellationToken);
-        Task<bool> IsInWalletTransactionAsync(string txId, CancellationToken cancellationToken);
-        Task<bool> IsTransactionFreeAsync(CreateRawTransactionRequest createRawTransactionRequest, CancellationToken cancellationToken);
+        Task<GetRawTransactionResponse> GetRawTxFromImmutableTxIdAsync(string rigidTxId, int listTransactionsCount = int.MaxValue, int listTransactionsFrom = 0, bool getRawTransactionVersbose = true, bool rigidTxIdIsSha256 = false, CancellationToken cancellationToken = default);
+        Task<string> GetImmutableTxIdAsync(string txId, bool getSha256Hash = false, CancellationToken cancellationToken = default);
+        Task<bool> IsInWalletTransactionAsync(string txId, CancellationToken cancellationToken = default);
+        Task<bool> IsTransactionFreeAsync(CreateRawTransactionRequest createRawTransactionRequest, CancellationToken cancellationToken = default);
         bool IsTransactionFree(IList<ListUnspentResponse> transactionInputs, int numberOfOutputs, decimal minimumAmountAmongOutputs);
-        Task<bool> IsWalletEncryptedAsync(CancellationToken cancellationToken);
+        Task<bool> IsWalletEncryptedAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -177,6 +177,11 @@ namespace BitcoinLib.Services
             return _rpcConnector.MakeRequestAsync<string>(RpcMethods.getblockhash, cancellationToken, index);
         }
 
+        public Task<GetBlockTemplateResponse> GetBlockTemplateAsync(params object[] parameters)
+        {
+            return GetBlockTemplateAsync(CancellationToken.None, parameters);
+        }
+
         public Task<GetBlockTemplateResponse> GetBlockTemplateAsync(CancellationToken cancellationToken, params object[] parameters)
         {
             return parameters == null
@@ -707,6 +712,11 @@ namespace BitcoinLib.Services
         public Task<string> StopAsync(CancellationToken cancellationToken)
         {
             return _rpcConnector.MakeRequestAsync<string>(RpcMethods.stop, cancellationToken);
+        }
+
+        public Task<string> SubmitBlockAsync(string hexData, params object[] parameters)
+        {
+            return SubmitBlockAsync(hexData, CancellationToken.None, parameters);
         }
 
         public Task<string> SubmitBlockAsync(string hexData, CancellationToken cancellationToken, params object[] parameters)
