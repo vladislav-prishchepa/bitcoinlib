@@ -24,7 +24,7 @@ namespace BitcoinLib.Services
         {
             if (validateAddressBeforeProcessing)
             {
-                var validateAddressResponse = await ValidateAddressAsync(inWalletAddress, cancellationToken);
+                var validateAddressResponse = await ValidateAddressAsync(inWalletAddress, cancellationToken).ConfigureAwait(false);
 
                 if (!validateAddressResponse.IsValid)
                 {
@@ -37,17 +37,22 @@ namespace BitcoinLib.Services
                 }
             }
 
-            var listUnspentResponses = await ListUnspentAsync(minConf, 9999999, new List<string>
-            {
-                inWalletAddress
-            }, cancellationToken);
+            var listUnspentResponses = await ListUnspentAsync(
+                minConf,
+                9999999,
+                new List<string>
+                {
+                    inWalletAddress
+                },
+                cancellationToken)
+                .ConfigureAwait(false);
 
             return listUnspentResponses.Any() ? listUnspentResponses.Sum(x => x.Amount) : 0;
         }
 
         public async Task<string> GetImmutableTxIdAsync(string txId, bool getSha256Hash, CancellationToken cancellationToken)
         {
-            var response = await GetRawTransactionAsync(txId, 1, cancellationToken);
+            var response = await GetRawTransactionAsync(txId, 1, cancellationToken).ConfigureAwait(false);
             var text = response.Vin.First().TxId + "|" + response.Vin.First().Vout + "|" + response.Vout.First().Value;
             return getSha256Hash ? Hashing.GetSha256(text) : text;
         }
@@ -81,21 +86,21 @@ namespace BitcoinLib.Services
         {
             const short secondsToUnlockTheWallet = 30;
             var keyPairs = new Dictionary<string, string>();
-            await WalletPassphraseAsync(Parameters.WalletPassword, secondsToUnlockTheWallet, cancellationToken);
-            var myAddresses = await ListReceivedByAddressAsync(0, true, null, cancellationToken);
+            await WalletPassphraseAsync(Parameters.WalletPassword, secondsToUnlockTheWallet, cancellationToken).ConfigureAwait(false);
+            var myAddresses = await ListReceivedByAddressAsync(0, true, null, cancellationToken).ConfigureAwait(false);
 
             foreach (var listReceivedByAddressResponse in myAddresses)
             {
-                var validateAddressResponse = await ValidateAddressAsync(listReceivedByAddressResponse.Address, cancellationToken);
+                var validateAddressResponse = await ValidateAddressAsync(listReceivedByAddressResponse.Address, cancellationToken).ConfigureAwait(false);
 
                 if (validateAddressResponse.IsMine && validateAddressResponse.IsValid && !validateAddressResponse.IsScript)
                 {
-                    var privateKey = await DumpPrivKeyAsync(listReceivedByAddressResponse.Address, cancellationToken);
+                    var privateKey = await DumpPrivKeyAsync(listReceivedByAddressResponse.Address, cancellationToken).ConfigureAwait(false);
                     keyPairs.Add(validateAddressResponse.PubKey, privateKey);
                 }
             }
 
-            await WalletLockAsync(cancellationToken);
+            await WalletLockAsync(cancellationToken).ConfigureAwait(false);
             return keyPairs;
         }
 
@@ -103,13 +108,13 @@ namespace BitcoinLib.Services
         public async Task<DecodeRawTransactionResponse> GetPublicTransactionAsync(string txId, CancellationToken cancellationToken)
         {
             var rawTransaction = (await GetRawTransactionAsync(txId, 0, cancellationToken)).Hex;
-            return await DecodeRawTransactionAsync(rawTransaction, cancellationToken);
+            return await DecodeRawTransactionAsync(rawTransaction, cancellationToken).ConfigureAwait(false);
         }
 
         [Obsolete("Please use EstimateFee() instead. You can however keep on using this method until the network fully adjusts to the new rules on fee calculation")]
         public async Task<decimal> GetTransactionFeeAsync(CreateRawTransactionRequest transaction, bool checkIfTransactionQualifiesForFreeRelay, bool enforceMinimumTransactionFeePolicy, CancellationToken cancellationToken)
         {
-            if (checkIfTransactionQualifiesForFreeRelay && await IsTransactionFreeAsync(transaction, cancellationToken))
+            if (checkIfTransactionQualifiesForFreeRelay && await IsTransactionFreeAsync(transaction, cancellationToken).ConfigureAwait(false))
             {
                 return 0;
             }
@@ -132,7 +137,7 @@ namespace BitcoinLib.Services
 
         public async Task<GetRawTransactionResponse> GetRawTxFromImmutableTxIdAsync(string rigidTxId, int listTransactionsCount, int listTransactionsFrom, bool getRawTransactionVersbose, bool rigidTxIdIsSha256, CancellationToken cancellationToken)
         {
-            var allTransactions = await ListTransactionsAsync("*", listTransactionsCount, listTransactionsFrom, null, cancellationToken);
+            var allTransactions = await ListTransactionsAsync("*", listTransactionsCount, listTransactionsFrom, null, cancellationToken).ConfigureAwait(false);
 
             var tcs = new TaskCompletionSource<GetRawTransactionResponse>();
 
@@ -146,8 +151,7 @@ namespace BitcoinLib.Services
                             {
                                 if (rigidTxId == task.Result)
                                 {
-                                    var transaction = await GetRawTransactionAsync(rawTransaction.TxId,
-                                        getRawTransactionVersbose ? 1 : 0, cancellationToken);
+                                    var transaction = await GetRawTransactionAsync(rawTransaction.TxId, getRawTransactionVersbose ? 1 : 0, cancellationToken).ConfigureAwait(false);
                                     tcs.TrySetResult(transaction);
                                 }
                             },
@@ -155,7 +159,7 @@ namespace BitcoinLib.Services
 
                 try
                 {
-                    await Task.WhenAny(Task.WhenAll(tasks), tcs.Task);
+                    await Task.WhenAny(Task.WhenAll(tasks), tcs.Task).ConfigureAwait(false);
 
                     tcs.TrySetResult(null);
 
@@ -180,8 +184,12 @@ namespace BitcoinLib.Services
                 return 0;
             }
 
-            var unspentInputs = (await (this as ICoinService).ListUnspentAsync(0, 99999, null, cancellationToken)).ToList();
-            var sumOfInputsValueInBaseUnitsMultipliedByTheirAge = transaction.Inputs.Select(input => unspentInputs.First(x => x.TxId == input.TxId)).Select(unspentResponse => (unspentResponse.Amount * Parameters.OneCoinInBaseUnits) * unspentResponse.Confirmations).Sum();
+            var unspentInputs = await ListUnspentAsync(0, 99999, null, cancellationToken).ConfigureAwait(false);
+            var sumOfInputsValueInBaseUnitsMultipliedByTheirAge = transaction.Inputs
+                .Select(input => unspentInputs.First(x => x.TxId == input.TxId))
+                .Select(unspentResponse => unspentResponse.Amount * Parameters.OneCoinInBaseUnits * unspentResponse.Confirmations)
+                .Sum();
+
             return sumOfInputsValueInBaseUnitsMultipliedByTheirAge / GetTransactionSizeInBytes(transaction);
         }
 
@@ -200,11 +208,11 @@ namespace BitcoinLib.Services
         [Obsolete("Please don't use this method in production enviroment, it's for testing purposes only")]
         public async Task<string> GetTransactionSenderAddressAsync(string txId, CancellationToken cancellationToken)
         {
-            var rawTransaction = (await GetRawTransactionAsync(txId, 0, cancellationToken)).Hex;
-            var decodedRawTransaction = await DecodeRawTransactionAsync(rawTransaction, cancellationToken);
+            var rawTransaction = (await GetRawTransactionAsync(txId, 0, cancellationToken).ConfigureAwait(false)).Hex;
+            var decodedRawTransaction = await DecodeRawTransactionAsync(rawTransaction, cancellationToken).ConfigureAwait(false);
             var transactionInputs = decodedRawTransaction.Vin;
-            var rawTransactionHex = (await GetRawTransactionAsync(transactionInputs[0].TxId, 0, cancellationToken)).Hex;
-            var inputDecodedRawTransaction = await DecodeRawTransactionAsync(rawTransactionHex, cancellationToken);
+            var rawTransactionHex = (await GetRawTransactionAsync(transactionInputs[0].TxId, 0, cancellationToken).ConfigureAwait(false)).Hex;
+            var inputDecodedRawTransaction = await DecodeRawTransactionAsync(rawTransactionHex, cancellationToken).ConfigureAwait(false);
             var vouts = inputDecodedRawTransaction.Vout;
             return vouts[0].ScriptPubKey.Addresses[0];
         }
@@ -225,14 +233,14 @@ namespace BitcoinLib.Services
         public async Task<bool> IsInWalletTransactionAsync(string txId, CancellationToken cancellationToken)
         {
             //  Note: This might not be efficient if iterated, consider caching ListTransactions' results.
-            return (await ListTransactionsAsync(null, int.MaxValue, 0, null, cancellationToken)).Any(listTransactionsResponse => listTransactionsResponse.TxId == txId);
+            return (await ListTransactionsAsync(null, int.MaxValue, 0, null, cancellationToken).ConfigureAwait(false)).Any(listTransactionsResponse => listTransactionsResponse.TxId == txId);
         }
 
         public async Task<bool> IsTransactionFreeAsync(CreateRawTransactionRequest transaction, CancellationToken cancellationToken)
         {
             return transaction.Outputs.Any(x => x.Value < Parameters.FreeTransactionMinimumOutputAmountInCoins)
                    && GetTransactionSizeInBytes(transaction) < Parameters.FreeTransactionMaximumSizeInBytes
-                   && await GetTransactionPriorityAsync(transaction, cancellationToken) > Parameters.FreeTransactionMinimumPriority;
+                   && await GetTransactionPriorityAsync(transaction, cancellationToken).ConfigureAwait(false) > Parameters.FreeTransactionMinimumPriority;
         }
 
         public bool IsTransactionFree(IList<ListUnspentResponse> transactionInputs, int numberOfOutputs, decimal minimumAmountAmongOutputs)
@@ -244,7 +252,7 @@ namespace BitcoinLib.Services
 
         public async Task<bool> IsWalletEncryptedAsync(CancellationToken cancellationToken)
         {
-            return !(await HelpAsync(RpcMethods.walletlock.ToString(), cancellationToken)).Contains("unknown command");
+            return !(await HelpAsync(RpcMethods.walletlock.ToString(), cancellationToken).ConfigureAwait(false)).Contains("unknown command");
         }
     }
 }

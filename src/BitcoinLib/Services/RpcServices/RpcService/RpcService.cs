@@ -209,7 +209,7 @@ namespace BitcoinLib.Services
             return _rpcConnector.MakeRequestAsync<bool>(RpcMethods.getgenerate, cancellationToken);
         }
 
-        [Obsolete("Please use calls: GetWalletInfo(), GetBlockchainInfo() and GetNetworkInfo() instead")]
+        [Obsolete("Please use calls: GetWalletInfoAsync(), GetBlockchainInfoAsync() and GetNetworkInfo() instead")]
         public Task<GetInfoResponse> GetInfoAsync(CancellationToken cancellationToken)
         {
             return _rpcConnector.MakeRequestAsync<GetInfoResponse>(RpcMethods.getinfo, cancellationToken);
@@ -259,7 +259,7 @@ namespace BitcoinLib.Services
                 IsVerbose = verbose
             };
 
-            var rpcResponse = await _rpcConnector.MakeRequestAsync<object>(RpcMethods.getrawmempool, cancellationToken, verbose);
+            var rpcResponse = await _rpcConnector.MakeRequestAsync<object>(RpcMethods.getrawmempool, cancellationToken, verbose).ConfigureAwait(false);
 
             if (!verbose)
             {
@@ -385,13 +385,13 @@ namespace BitcoinLib.Services
             {
                 return new GetRawTransactionResponse
                 {
-                    Hex = await _rpcConnector.MakeRequestAsync<string>(RpcMethods.getrawtransaction, cancellationToken, txId, verbose)
+                    Hex = await _rpcConnector.MakeRequestAsync<string>(RpcMethods.getrawtransaction, cancellationToken, txId, verbose).ConfigureAwait(false)
                 };
             }
 
             if (verbose == 1)
             {
-                return await _rpcConnector.MakeRequestAsync<GetRawTransactionResponse>(RpcMethods.getrawtransaction, cancellationToken, txId, verbose);
+                return await _rpcConnector.MakeRequestAsync<GetRawTransactionResponse>(RpcMethods.getrawtransaction, cancellationToken, txId, verbose).ConfigureAwait(false);
             }
 
             throw new Exception("Invalid verbose value: " + verbose + " in GetRawTransaction()!");
@@ -475,7 +475,7 @@ namespace BitcoinLib.Services
 
         public async Task<List<List<ListAddressGroupingsResponse>>> ListAddressGroupingsAsync(CancellationToken cancellationToken)
         {
-            var unstructuredResponse = await _rpcConnector.MakeRequestAsync<List<List<List<object>>>>(RpcMethods.listaddressgroupings, cancellationToken);
+            var unstructuredResponse = await _rpcConnector.MakeRequestAsync<List<List<List<object>>>>(RpcMethods.listaddressgroupings, cancellationToken).ConfigureAwait(false);
             var structuredResponse = new List<List<ListAddressGroupingsResponse>>(unstructuredResponse.Count);
 
             for (var i = 0; i < unstructuredResponse.Count; i++)
