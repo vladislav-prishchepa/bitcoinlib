@@ -27,18 +27,18 @@ namespace BitcoinLib.Services.Coins.Mogwaicoin
         public Task<string> SendToAddressAsync(string mogwaiAddress, decimal amount, string comment = null, string commentTo = null,
             bool subtractFeeFromAmount = false, bool useInstantSend = false, bool usePrivateSend = false, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _rpcConnector.MakeRequestAsync<string>(RpcMethods.sendtoaddress, cancellationToken, mogwaiAddress, amount, comment, commentTo,
+            return _asyncRpcConnector.MakeRequestAsync<string>(RpcMethods.sendtoaddress, cancellationToken, mogwaiAddress, amount, comment, commentTo,
                 subtractFeeFromAmount, useInstantSend, usePrivateSend);
         }
 
         public Task<MirrorAddressResponse> MirrorAddressAsync(string mogwaiAddress, CancellationToken cancellationToken)
         {
-            return _rpcConnector.MakeRequestAsync<MirrorAddressResponse>(RpcMethods.mirroraddress, cancellationToken, mogwaiAddress);
+            return _asyncRpcConnector.MakeRequestAsync<MirrorAddressResponse>(RpcMethods.mirroraddress, cancellationToken, mogwaiAddress);
         }
 
         public Task<List<ListMirrorTransactionsResponse>> ListMirrorTransactionsAsync(string mogwaiAddress, CancellationToken cancellationToken)
         {
-            return _rpcConnector.MakeRequestAsync<List<ListMirrorTransactionsResponse>>(RpcMethods.listmirrtransactions, cancellationToken, mogwaiAddress);
+            return _asyncRpcConnector.MakeRequestAsync<List<ListMirrorTransactionsResponse>>(RpcMethods.listmirrtransactions, cancellationToken, mogwaiAddress);
         }
 
         public MogwaicoinConstants.Constants Constants => MogwaicoinConstants.Constants.Instance;
