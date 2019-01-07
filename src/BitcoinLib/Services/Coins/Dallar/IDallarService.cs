@@ -10,6 +10,7 @@ namespace BitcoinLib.Services.Coins.Dallar
 {
     public interface IDallarService : ICoinService, IDallarConstants
     {
+        decimal GetEstimateFeeForSendToAddress(string Address, decimal Amount);
         Task<decimal> GetEstimateFeeForSendToAddressAsync(string Address, decimal Amount, CancellationToken cancellationToken);
     }
 }

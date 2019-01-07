@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <LangVersion>7.1</LangVersion>
     <OutputType>Exe</OutputType>
     <ProjectGuid>{56F54485-7B42-4E41-95D3-1998EA614695}</ProjectGuid>
     <AssemblyName>ConsoleClient</AssemblyName>

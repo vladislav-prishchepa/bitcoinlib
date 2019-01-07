@@ -5,8 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using BitcoinLib.CoinParameters.Dallar;
 using BitcoinLib.Requests.CreateRawTransaction;
-using BitcoinLib.Responses;
-using BitcoinLib.RPC.Specifications;
 
 namespace BitcoinLib.Services.Coins.Dallar
 {
@@ -27,6 +25,13 @@ namespace BitcoinLib.Services.Coins.Dallar
         }
 
         public DallarConstants.Constants Constants => DallarConstants.Constants.Instance;
+
+        public decimal GetEstimateFeeForSendToAddress(string Address, decimal Amount)
+        {
+            var txRequest = new CreateRawTransactionRequest();
+            txRequest.AddOutput(Address, Amount);
+            return GetFundRawTransaction(CreateRawTransaction(txRequest)).Fee;
+        }
 
         public async Task<decimal> GetEstimateFeeForSendToAddressAsync(string Address, decimal Amount, CancellationToken cancellationToken)
         {

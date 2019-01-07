@@ -24,6 +24,24 @@ namespace BitcoinLib.Services.Coins.Mogwaicoin
         }
 
         /// <inheritdoc />
+        public string SendToAddress(string mogwaiAddress, decimal amount, string comment = null, string commentTo = null,
+            bool subtractFeeFromAmount = false, bool useInstantSend = false, bool usePrivateSend = false)
+        {
+            return _rpcConnector.MakeRequest<string>(RpcMethods.sendtoaddress, mogwaiAddress, amount, comment, commentTo,
+                subtractFeeFromAmount, useInstantSend, usePrivateSend);
+        }
+
+        public MirrorAddressResponse MirrorAddress(string mogwaiAddress)
+        {
+            return _rpcConnector.MakeRequest<MirrorAddressResponse>(RpcMethods.mirroraddress, mogwaiAddress);
+        }
+
+        public List<ListMirrorTransactionsResponse> ListMirrorTransactions(string mogwaiAddress)
+        {
+            return _rpcConnector.MakeRequest<List<ListMirrorTransactionsResponse>>(RpcMethods.listmirrtransactions, mogwaiAddress);
+        }
+
+        /// <inheritdoc />
         public Task<string> SendToAddressAsync(string mogwaiAddress, decimal amount, string comment = null, string commentTo = null,
             bool subtractFeeFromAmount = false, bool useInstantSend = false, bool usePrivateSend = false, CancellationToken cancellationToken = default(CancellationToken))
         {

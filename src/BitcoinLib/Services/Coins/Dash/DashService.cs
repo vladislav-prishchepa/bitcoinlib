@@ -23,6 +23,14 @@ namespace BitcoinLib.Services.Coins.Dash
         }
 
         /// <inheritdoc />
+        public string SendToAddress(string dashAddress, decimal amount, string comment = null, string commentTo = null,
+            bool subtractFeeFromAmount = false, bool useInstantSend = false, bool usePrivateSend = false)
+        {
+            return _rpcConnector.MakeRequest<string>(RpcMethods.sendtoaddress, dashAddress, amount, comment, commentTo,
+                subtractFeeFromAmount, useInstantSend, usePrivateSend);
+        }
+
+        /// <inheritdoc />
         public Task<string> SendToAddressAsync(string dashAddress, decimal amount, string comment = null, string commentTo = null,
             bool subtractFeeFromAmount = false, bool useInstantSend = false, bool usePrivateSend = false, CancellationToken cancellationToken = default(CancellationToken))
         {

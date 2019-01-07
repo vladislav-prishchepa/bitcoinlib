@@ -8,9 +8,7 @@ using BitcoinLib.Requests.AddNode;
 using BitcoinLib.Requests.CreateRawTransaction;
 using BitcoinLib.Requests.SignRawTransaction;
 using BitcoinLib.Responses;
-using BitcoinLib.RPC.Connector;
 using BitcoinLib.RPC.Specifications;
-using BitcoinLib.Services.Coins.Base;
 using Newtonsoft.Json.Linq;
 
 namespace BitcoinLib.Services

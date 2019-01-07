@@ -13,7 +13,6 @@ using BitcoinLib.ExtensionMethods;
 using BitcoinLib.Requests.CreateRawTransaction;
 using BitcoinLib.Responses;
 using BitcoinLib.RPC.Specifications;
-using BitcoinLib.Services.Coins.Base;
 
 namespace BitcoinLib.Services
 {

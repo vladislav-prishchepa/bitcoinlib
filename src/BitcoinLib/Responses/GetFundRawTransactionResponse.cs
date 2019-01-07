@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BitcoinLib.Responses
+﻿namespace BitcoinLib.Responses
 {
     public class GetFundRawTransactionResponse
     {
