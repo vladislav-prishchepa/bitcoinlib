@@ -21,6 +21,9 @@ namespace BitcoinLib.Services
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            if (_coinParameters.RpcRequestTimeoutInSeconds <= 0)
+                return await base.SendAsync(request, cancellationToken);
+
             using (var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_coinParameters.RpcRequestTimeoutInSeconds)))
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token))
             {

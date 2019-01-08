@@ -78,8 +78,7 @@ namespace BitcoinLib.RPC.Connector
                                         throw new RpcException(responseContent);
                                     }
                                 default:
-                                    throw new RpcException(
-                                        "The RPC request was either not understood by the server or there was a problem executing the request");
+                                    throw new RpcException("The RPC request was either not understood by the server or there was a problem executing the request");
                             }
                         }
 
@@ -87,9 +86,9 @@ namespace BitcoinLib.RPC.Connector
                         return rpcResponse.Result;
                     }
                 }
-                catch (HttpRequestException)
+                catch (HttpRequestException httpRequestException)
                 {
-                    throw new NotImplementedException();
+                    throw new RpcException("The RPC request was either not understood by the server or there was a problem executing the request", httpRequestException);
                 }
                 catch (JsonException jsonException)
                 {
