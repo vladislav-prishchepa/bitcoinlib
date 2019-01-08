@@ -2,6 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>7.2</LangVersion>
     <Title>BitcoinLib</Title>
     <Description>The most complete, up-to-date, battle-tested library and RPC wrapper for Bitcoin, Litecoin, Dogecoin and other Bitcoin clones in .NET.</Description>
     <Copyright>© George Kimionis 2018</Copyright>

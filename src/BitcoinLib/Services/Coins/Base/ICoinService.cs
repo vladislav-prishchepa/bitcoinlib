@@ -7,7 +7,12 @@ using BitcoinLib.Services.RpcServices.RpcService;
 
 namespace BitcoinLib.Services.Coins.Base
 {
-    public interface ICoinService : IRpcService, IRpcExtenderService, ICoinParameters
+    public interface ICoinService :
+        IRpcService,
+        IRpcExtenderService,
+        IAsyncRpcService,
+        IAsyncRpcExtenderService,
+        ICoinParameters
     {
     }
 }

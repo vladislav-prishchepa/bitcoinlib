@@ -8,42 +8,14 @@ using BitcoinLib.Requests.AddNode;
 using BitcoinLib.Requests.CreateRawTransaction;
 using BitcoinLib.Requests.SignRawTransaction;
 using BitcoinLib.Responses;
-using BitcoinLib.RPC.Connector;
 using BitcoinLib.RPC.Specifications;
-using BitcoinLib.Services.Coins.Base;
 using Newtonsoft.Json.Linq;
 
 namespace BitcoinLib.Services
 {
     //   Implementation of API calls list, as found at: https://en.bitcoin.it/wiki/Original_Bitcoin_client/API_Calls_list (note: this list is often out-of-date so call "help" in your bitcoin-cli to get the latest signatures)
-    public partial class CoinService : ICoinService
+    public partial class CoinService
     {
-        protected readonly IRpcConnector _rpcConnector;
-
-        public CoinService()
-        {
-            _rpcConnector = new RpcConnector(this);
-            Parameters = new CoinParameters(this, null, null, null, null, 0);
-        }
-
-        public CoinService(bool useTestnet) : this()
-        {
-            Parameters.UseTestnet = useTestnet;
-        }
-
-        public CoinService(string daemonUrl, string rpcUsername, string rpcPassword, string walletPassword)
-        {
-            _rpcConnector = new RpcConnector(this);
-            Parameters = new CoinParameters(this, daemonUrl, rpcUsername, rpcPassword, walletPassword, 0);
-        }
-
-        //  this provides support for cases where *.config files are not an option
-        public CoinService(string daemonUrl, string rpcUsername, string rpcPassword, string walletPassword, short rpcRequestTimeoutInSeconds)
-        {
-            _rpcConnector = new RpcConnector(this);
-            Parameters = new CoinParameters(this, daemonUrl, rpcUsername, rpcPassword, walletPassword, rpcRequestTimeoutInSeconds);
-        }
-
         public string AddMultiSigAddress(int nRquired, List<string> publicKeys, string account)
         {
             return account != null
@@ -256,7 +228,7 @@ namespace BitcoinLib.Services
 
             if (!verbose)
             {
-                var rpcResponseAsArray = (JArray) rpcResponse;
+                var rpcResponseAsArray = (JArray)rpcResponse;
 
                 foreach (string txId in rpcResponseAsArray)
                 {
@@ -266,7 +238,7 @@ namespace BitcoinLib.Services
                 return getRawMemPoolResponse;
             }
 
-            IList<KeyValuePair<string, JToken>> rpcResponseAsKvp = (new EnumerableQuery<KeyValuePair<string, JToken>>(((JObject) (rpcResponse)))).ToList();
+            IList<KeyValuePair<string, JToken>> rpcResponseAsKvp = (new EnumerableQuery<KeyValuePair<string, JToken>>(((JObject)(rpcResponse)))).ToList();
             IList<JToken> children = JObject.Parse(rpcResponse.ToString()).Children().ToList();
 
             for (var i = 0; i < children.Count(); i++)
@@ -561,7 +533,8 @@ namespace BitcoinLib.Services
             {
                 transactions.Add(new
                 {
-                    txid = listUnspentResponse.TxId, vout = listUnspentResponse.Vout
+                    txid = listUnspentResponse.TxId,
+                    vout = listUnspentResponse.Vout
                 });
             }
 
@@ -742,11 +715,6 @@ namespace BitcoinLib.Services
         public string WalletPassphraseChange(string oldPassphrase, string newPassphrase)
         {
             return _rpcConnector.MakeRequest<string>(RpcMethods.walletpassphrasechange, oldPassphrase, newPassphrase);
-        }
-
-        public override string ToString()
-        {
-            return Parameters.CoinLongName;
         }
     }
 }
