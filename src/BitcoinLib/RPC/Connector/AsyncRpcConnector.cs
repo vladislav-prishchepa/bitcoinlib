@@ -21,17 +21,22 @@ namespace BitcoinLib.RPC.Connector
     public sealed class AsyncRpcConnector : IAsyncRpcConnector
     {
         private readonly ICoinService _coinService;
-        private readonly HttpClient _httpClient;
+        private readonly Lazy<HttpClient> _httpClient;
 
         public AsyncRpcConnector(ICoinService coinService)
         {
             _coinService = coinService;
-            _httpClient = new HttpClient(new RpcClientHandler(coinService.Parameters));
+            _httpClient = new Lazy<HttpClient>(() =>
+            {
+	            var httpClient = new HttpClient(new RpcClientHandler(coinService.Parameters));
 
-            var authInfo = $"{coinService.Parameters.RpcUsername}:{coinService.Parameters.RpcPassword}";
-            authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
+	            var authInfo = $"{coinService.Parameters.RpcUsername}:{coinService.Parameters.RpcPassword}";
+	            authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authInfo);
+	            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authInfo);
+
+	            return httpClient;
+            });
         }
 
         public async Task<T> MakeRequestAsync<T>(RpcMethods rpcMethod, CancellationToken cancellationToken, params object[] parameters)
@@ -48,7 +53,7 @@ namespace BitcoinLib.RPC.Connector
 
                 try
                 {
-                    using (var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken))
+                    using (var response = await _httpClient.Value.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken))
                     {
                         if (response.Content == null)
                             throw new RpcException("The RPC request was either not understood by the server or there was a problem executing the request");
