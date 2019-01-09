@@ -53,55 +53,69 @@ namespace BitcoinLib.RPC.Connector
 
                 try
                 {
-                    using (var response = await _httpClient.Value.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken))
-                    {
-                        if (response.Content == null)
-                            throw new RpcException("The RPC request was either not understood by the server or there was a problem executing the request");
+	                using (var response = await _httpClient.Value.SendAsync(request,
+		                HttpCompletionOption.ResponseContentRead, cancellationToken))
+	                {
+		                if (response.Content == null)
+			                throw new RpcException(
+				                "The RPC request was either not understood by the server or there was a problem executing the request");
 
-                        var responseContent = await response.Content.ReadAsStringAsync();
+		                var responseContent = await response.Content.ReadAsStringAsync();
 
-                        if (!response.IsSuccessStatusCode)
-                        {
-                            switch (response.StatusCode)
-                            {
-                                case HttpStatusCode.InternalServerError:
-                                    try
-                                    {
-                                        var jsonRpcResponseObject =
-                                            JsonConvert.DeserializeObject<JsonRpcResponse<object>>(responseContent);
+		                if (!response.IsSuccessStatusCode)
+		                {
+			                switch (response.StatusCode)
+			                {
+				                case HttpStatusCode.InternalServerError:
+					                try
+					                {
+						                var jsonRpcResponseObject =
+							                JsonConvert.DeserializeObject<JsonRpcResponse<object>>(responseContent);
 
-                                        var internalServerErrorException =
-                                            new RpcInternalServerErrorException(jsonRpcResponseObject.Error.Message)
-                                            {
-                                                RpcErrorCode = jsonRpcResponseObject.Error.Code
-                                            };
+						                var internalServerErrorException =
+							                new RpcInternalServerErrorException(jsonRpcResponseObject.Error.Message)
+							                {
+								                RpcErrorCode = jsonRpcResponseObject.Error.Code
+							                };
 
-                                        throw internalServerErrorException;
-                                    }
-                                    catch (JsonException)
-                                    {
-                                        throw new RpcException(responseContent);
-                                    }
-                                default:
-                                    throw new RpcException("The RPC request was either not understood by the server or there was a problem executing the request");
-                            }
-                        }
+						                throw internalServerErrorException;
+					                }
+					                catch (JsonException)
+					                {
+						                throw new RpcException(responseContent);
+					                }
+				                default:
+					                throw new RpcException(
+						                "The RPC request was either not understood by the server or there was a problem executing the request");
+			                }
+		                }
 
-                        var rpcResponse = JsonConvert.DeserializeObject<JsonRpcResponse<T>>(responseContent);
-                        return rpcResponse.Result;
-                    }
+		                var rpcResponse = JsonConvert.DeserializeObject<JsonRpcResponse<T>>(responseContent);
+		                return rpcResponse.Result;
+	                }
                 }
                 catch (HttpRequestException httpRequestException)
                 {
-                    throw new RpcException("The RPC request was either not understood by the server or there was a problem executing the request", httpRequestException);
+	                throw new RpcException(
+		                "The RPC request was either not understood by the server or there was a problem executing the request",
+		                httpRequestException);
                 }
                 catch (JsonException jsonException)
                 {
-                    throw new RpcResponseDeserializationException("There was a problem deserializing the response from the wallet", jsonException);
+	                throw new RpcResponseDeserializationException(
+		                "There was a problem deserializing the response from the wallet", jsonException);
                 }
                 catch (TimeoutException)
                 {
-                    throw new RpcRequestTimeoutException("The operation has timed out");
+	                throw new RpcRequestTimeoutException("The operation has timed out");
+                }
+                catch (RpcInternalServerErrorException)
+                {
+	                throw;
+                }
+                catch (RpcException)
+                {
+	                throw;
                 }
                 catch (Exception exception)
                 {
