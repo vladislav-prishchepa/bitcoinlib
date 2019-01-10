@@ -40,5 +40,10 @@ namespace BitcoinLib.Services
         {
             return Parameters.CoinLongName;
         }
+
+        public void Dispose()
+        {
+			_asyncRpcConnector.Dispose();
+        }
     }
 }

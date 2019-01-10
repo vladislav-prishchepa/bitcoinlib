@@ -22,6 +22,7 @@ namespace BitcoinLib.RPC.Connector
     {
         private readonly ICoinService _coinService;
         private readonly Lazy<HttpClient> _httpClient;
+        private volatile bool _disposed;
 
         public AsyncRpcConnector(ICoinService coinService)
         {
@@ -41,7 +42,10 @@ namespace BitcoinLib.RPC.Connector
 
         public async Task<T> MakeRequestAsync<T>(RpcMethods rpcMethod, CancellationToken cancellationToken, params object[] parameters)
         {
-            var jsonRpcRequest = new JsonRpcRequest(1, rpcMethod.ToString(), parameters);
+	        if (_disposed)
+		        throw new ObjectDisposedException(nameof(_httpClient));
+
+	        var jsonRpcRequest = new JsonRpcRequest(1, rpcMethod.ToString(), parameters);
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, _coinService.Parameters.SelectedDaemonUrl))
             {
@@ -123,6 +127,19 @@ namespace BitcoinLib.RPC.Connector
                     throw new Exception($"A problem was encountered while calling MakeRpcRequest() for: {jsonRpcRequest.Method} with parameters: {queryParameters}. \nException: {exception.Message}");
                 }
             }
+        }
+
+        public void Dispose()
+        {
+	        if (_disposed)
+		        return;
+
+	        _disposed = true;
+
+	        if (!_httpClient.IsValueCreated)
+		        return;
+
+	        _httpClient.Value.Dispose();
         }
     }
 }
